@@ -30,26 +30,22 @@ jobs:
           d = feedparser.parse("rss.xml")
           items = d.entries[:5]
 
-          content = []
-          for i in items:
-              content.append(f"- [{i.title}]({i.link})")
-
           with open("latest.txt", "w", encoding="utf8") as f:
-              f.write("\n".join(content))
+              for i in items:
+                  f.write(f"- [{i.title}]({i.link})\n")
           EOF
 
       - name: Update README.md section
         run: |
-          CONTENT=$(cat latest.txt)
           START="<!-- START:latest-posts -->"
           END="<!-- END:latest-posts -->"
 
-          sed -i "/$START/,/$END/{ /$START/{p; r latest.txt
-            }; /$END/p; d }" README.md
+          sed -i "/$START/,/$END/{ /$START/!{ /$END/!d } }" README.md
+
+          sed -i "/$START/ r latest.txt" README.md
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Update latest posts in README"
-          file_pattern: |
-            README.md
+          file_pattern: README.md
