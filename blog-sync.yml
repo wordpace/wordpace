@@ -1,0 +1,41 @@
+name: Sync WP RSS to Github
+
+on:
+  schedule:
+    - cron: "0 */6 * * *" # cron6h
+  workflow_dispatch: # go
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Fetch RSS
+        run: |
+          curl -L "https://www.wordpace.com/feed/" -o rss.xml
+
+      - name: Parse RSS and Build List
+        run: |
+          python3 << 'EOF'
+          import feedparser, json
+
+          d = feedparser.parse("rss.xml")
+
+          # 5篇
+          items = d.entries[:5]
+
+          lines = ["## 📌 最新文章"]
+          for i in items:
+              lines.append(f"- [{i.title}]({i.link})")
+
+          with open("LATEST.md", "w", encoding="utf8") as f:
+              f.write("\n".join(lines))
+          EOF
+
+      - name: Commit Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update latest posts"
+          file_pattern: "LATEST.md"
