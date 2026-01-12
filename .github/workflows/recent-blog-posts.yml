@@ -30,12 +30,12 @@ jobs:
           d = feedparser.parse("rss.xml")
           items = d.entries[:5]
 
-          content = ["## 📌 最新博文"]
+          lines = []
           for i in items:
-              content.append(f"- [{i.title}]({i.link})")
+              lines.append(f'<a href="{i.link}" target="_blank">{i.title}</a><br>')
 
           with open("latest.txt", "w", encoding="utf8") as f:
-              f.write("\n".join(content))
+              f.write("\n".join(lines))
           EOF
 
       - name: Update README.md section
