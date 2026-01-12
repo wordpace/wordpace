@@ -2,8 +2,8 @@ name: Sync WP RSS to Github
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # cron6h
-  workflow_dispatch: # go
+    - cron: "0 */6 * * *" # 每6小时
+  workflow_dispatch: # 手动
 
 jobs:
   sync:
@@ -16,6 +16,11 @@ jobs:
         run: |
           curl -L "https://www.wordpace.com/feed/" -o rss.xml
 
+      # feedparser依赖
+      - name: Install dependencies
+        run: |
+          pip3 install feedparser
+
       - name: Parse RSS and Build List
         run: |
           python3 << 'EOF'
@@ -23,7 +28,7 @@ jobs:
 
           d = feedparser.parse("rss.xml")
 
-          # 5篇
+          # 5篇文章
           items = d.entries[:5]
 
           lines = ["## 📌 最新文章"]
