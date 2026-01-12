@@ -42,6 +42,8 @@ jobs:
 
           sed -i "/$START/,/$END/{ /$START/!{ /$END/!d } }" README.md
 
+          sed -i -e '$a\' latest.txt
+
           sed -i "/$START/ r latest.txt" README.md
 
       - name: Commit Changes
