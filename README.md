@@ -1,7 +1,7 @@
 - 👋 Hi, I’m @wordpace
 - ⛓ wordpace.com
 
-## Blog posts
+## Blog Posts
 <!-- START:latest-posts -->
 - [夜登梧桐山奇遇](https://www.wordpace.com/night-hike-wutong-mountain-encounter/)
 - [记账工具 Firefly III](https://www.wordpace.com/personal-finance-manager-firefly-iii/)
