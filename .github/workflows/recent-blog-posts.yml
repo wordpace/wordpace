@@ -2,8 +2,8 @@ name: Sync WP RSS to Github
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # 每6小时
-  workflow_dispatch: # 手动
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,31 +19,37 @@ jobs:
         run: |
           curl -L "https://www.wordpace.com/feed/" -o rss.xml
 
-      # feedparser依赖
       - name: Install dependencies
-        run: |
-          pip3 install feedparser
+        run: pip3 install feedparser
 
       - name: Parse RSS and Build List
         run: |
           python3 << 'EOF'
-          import feedparser, json
+          import feedparser
 
           d = feedparser.parse("rss.xml")
-
-          # 5篇文章
           items = d.entries[:5]
 
-          lines = ["## 📌 最新文章"]
+          content = ["## 📌 最新博文"]
           for i in items:
-              lines.append(f"- [{i.title}]({i.link})")
+              content.append(f"- [{i.title}]({i.link})")
 
-          with open("LATEST.md", "w", encoding="utf8") as f:
-              f.write("\n".join(lines))
+          with open("latest.txt", "w", encoding="utf8") as f:
+              f.write("\n".join(content))
           EOF
+
+      - name: Update README.md section
+        run: |
+          CONTENT=$(cat latest.txt)
+          START="<!-- START:latest-posts -->"
+          END="<!-- END:latest-posts -->"
+
+          sed -i "/$START/,/$END/{ /$START/{p; r latest.txt
+            }; /$END/p; d }" README.md
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update latest posts"
-          file_pattern: "LATEST.md"
+          commit_message: "Update latest posts in README"
+          file_pattern: |
+            README.md
